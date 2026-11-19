@@ -1,0 +1,27 @@
+# Demo del error provocado del Tema 4 (solo docente). En el repositorio de demostración, en una rama
+# creada desde el estado del Tema 3 (sin .dockerignore): un .env falso (APP_ENV=demo,
+# API_TOKEN=tok_demo_0000) agregado con `git add -f .env` (el .gitignore lo excluye), y
+# Dockerfile.copiatodo, que usa "COPY . ." Copiar este archivo como .github/workflows/demo-env.yml
+# en esa rama: corre con cada push a la rama demo-env.
+name: Demo - .env dentro de la imagen
+
+on:
+  push:
+    branches: [demo-env]
+
+permissions:
+  contents: read
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Construir con COPY . .
+        run: docker build -f Dockerfile.copiatodo -t demo-copiatodo .
+
+      - name: Lo que quedó dentro de la imagen
+        run: |
+          docker run --rm demo-copiatodo ls -la /app
+          docker run --rm demo-copiatodo cat /app/.env
